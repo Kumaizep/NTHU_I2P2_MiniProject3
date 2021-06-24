@@ -1,9 +1,9 @@
-#include <iostream>
-#include <fstream>
 #include <array>
-#include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 struct Point {
     int x, y;
@@ -41,7 +41,8 @@ void write_valid_spot(std::ofstream& fout) {
         // Choose random spot. (Not random uniform here)
         int index = (rand() % n_valid_spots);
         Point p = next_valid_spots[index];
-        // Remember to flush the output to ensure the last action is written to file.
+        // Remember to flush the output to ensure the last action is written to
+        // file.
         fout << p.x << " " << p.y << std::endl;
         fout.flush();
     }

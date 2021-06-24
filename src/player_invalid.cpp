@@ -1,9 +1,9 @@
-#include <iostream>
-#include <fstream>
 #include <array>
-#include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 struct Point {
     int x, y;
@@ -38,7 +38,8 @@ void write_valid_spot(std::ofstream& fout) {
     // May result in invalid actions.
     int x = (rand() % 8);
     int y = (rand() % 8);
-    // Remember to flush the output to ensure the last action is written to file.
+    // Remember to flush the output to ensure the last action is written to
+    // file.
     fout << x << " " << y << std::endl;
     fout.flush();
 }

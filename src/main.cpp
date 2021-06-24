@@ -1,61 +1,46 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <array>
-#include <vector>
 #include <cassert>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 struct Point {
     int x, y;
-	Point() : Point(0, 0) {}
-	Point(float x, float y) : x(x), y(y) {}
-	bool operator==(const Point& rhs) const {
-		return x == rhs.x && y == rhs.y;
-	}
-	bool operator!=(const Point& rhs) const {
-		return !operator==(rhs);
-	}
-	Point operator+(const Point& rhs) const {
-		return Point(x + rhs.x, y + rhs.y);
-	}
-	Point operator-(const Point& rhs) const {
-		return Point(x - rhs.x, y - rhs.y);
-	}
+    Point() : Point(0, 0) {}
+    Point(float x, float y) : x(x), y(y) {}
+    bool operator==(const Point& rhs) const { return x == rhs.x && y == rhs.y; }
+    bool operator!=(const Point& rhs) const { return !operator==(rhs); }
+    Point operator+(const Point& rhs) const {
+        return Point(x + rhs.x, y + rhs.y);
+    }
+    Point operator-(const Point& rhs) const {
+        return Point(x - rhs.x, y - rhs.y);
+    }
 };
 
 class OthelloBoard {
-public:
-    enum SPOT_STATE {
-        EMPTY = 0,
-        BLACK = 1,
-        WHITE = 2
-    };
+  public:
+    enum SPOT_STATE { EMPTY = 0, BLACK = 1, WHITE = 2 };
     static const int SIZE = 8;
-    const std::array<Point, 8> directions{{
-        Point(-1, -1), Point(-1, 0), Point(-1, 1),
-        Point(0, -1), /*{0, 0}, */Point(0, 1),
-        Point(1, -1), Point(1, 0), Point(1, 1)
-    }};
+    const std::array<Point, 8> directions{
+        {Point(-1, -1), Point(-1, 0), Point(-1, 1), Point(0, -1),
+         /*{0, 0}, */ Point(0, 1), Point(1, -1), Point(1, 0), Point(1, 1)}};
     std::array<std::array<int, SIZE>, SIZE> board;
     std::vector<Point> next_valid_spots;
     std::array<int, 3> disc_count;
     int cur_player;
     bool done;
     int winner;
-private:
-    int get_next_player(int player) const {
-        return 3 - player;
-    }
+
+  private:
+    int get_next_player(int player) const { return 3 - player; }
     bool is_spot_on_board(Point p) const {
         return 0 <= p.x && p.x < SIZE && 0 <= p.y && p.y < SIZE;
     }
-    int get_disc(Point p) const {
-        return board[p.x][p.y];
-    }
-    void set_disc(Point p, int disc) {
-        board[p.x][p.y] = disc;
-    }
+    int get_disc(Point p) const { return board[p.x][p.y]; }
+    void set_disc(Point p, int disc) { board[p.x][p.y] = disc; }
     bool is_disc_at(Point p, int disc) const {
         if (!is_spot_on_board(p))
             return false;
@@ -66,7 +51,7 @@ private:
     bool is_spot_valid(Point center) const {
         if (get_disc(center) != EMPTY)
             return false;
-        for (Point dir: directions) {
+        for (Point dir : directions) {
             // Move along the direction while testing.
             Point p = center + dir;
             if (!is_disc_at(p, get_next_player(cur_player)))
@@ -81,7 +66,7 @@ private:
         return false;
     }
     void flip_discs(Point center) {
-        for (Point dir: directions) {
+        for (Point dir : directions) {
             // Move along the direction while testing.
             Point p = center + dir;
             if (!is_disc_at(p, get_next_player(cur_player)))
@@ -90,7 +75,7 @@ private:
             p = p + dir;
             while (is_spot_on_board(p) && get_disc(p) != EMPTY) {
                 if (is_disc_at(p, cur_player)) {
-                    for (Point s: discs) {
+                    for (Point s : discs) {
                         set_disc(s, cur_player);
                     }
                     disc_count[cur_player] += discs.size();
@@ -102,10 +87,9 @@ private:
             }
         }
     }
-public:
-    OthelloBoard() {
-        reset();
-    }
+
+  public:
+    OthelloBoard() { reset(); }
     void reset() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -115,7 +99,7 @@ public:
         board[3][4] = board[4][3] = BLACK;
         board[3][3] = board[4][4] = WHITE;
         cur_player = BLACK;
-        disc_count[EMPTY] = 8*8-4;
+        disc_count[EMPTY] = 8 * 8 - 4;
         disc_count[BLACK] = 2;
         disc_count[WHITE] = 2;
         next_valid_spots = get_valid_spots();
@@ -136,7 +120,7 @@ public:
         return valid_spots;
     }
     bool put_disc(Point p) {
-        if(!is_spot_valid(p)) {
+        if (!is_spot_valid(p)) {
             winner = get_next_player(cur_player);
             done = true;
             return false;
@@ -157,31 +141,41 @@ public:
                 done = true;
                 int white_discs = disc_count[WHITE];
                 int black_discs = disc_count[BLACK];
-                if (white_discs == black_discs) winner = EMPTY;
-                else if (black_discs > white_discs) winner = BLACK;
-                else winner = WHITE;
+                if (white_discs == black_discs)
+                    winner = EMPTY;
+                else if (black_discs > white_discs)
+                    winner = BLACK;
+                else
+                    winner = WHITE;
             }
         }
         return true;
     }
     std::string encode_player(int state) {
-        if (state == BLACK) return "O";
-        if (state == WHITE) return "X";
+        if (state == BLACK)
+            return "O";
+        if (state == WHITE)
+            return "X";
         return "Draw";
     }
     std::string encode_spot(int x, int y) {
-        if (is_spot_valid(Point(x, y))) return ".";
-        if (board[x][y] == BLACK) return "O";
-        if (board[x][y] == WHITE) return "X";
+        if (is_spot_valid(Point(x, y)))
+            return ".";
+        if (board[x][y] == BLACK)
+            return "O";
+        if (board[x][y] == WHITE)
+            return "X";
         return " ";
     }
-    std::string encode_output(bool fail=false) {
+    std::string encode_output(bool fail = false) {
         int i, j;
         std::stringstream ss;
-        ss << "Timestep #" << (8*8-4-disc_count[EMPTY]+1) << "\n";
-        ss << "O: " << disc_count[BLACK] << "; X: " << disc_count[WHITE] << "\n";
+        ss << "Timestep #" << (8 * 8 - 4 - disc_count[EMPTY] + 1) << "\n";
+        ss << "O: " << disc_count[BLACK] << "; X: " << disc_count[WHITE]
+           << "\n";
         if (fail) {
-            ss << "Winner is " << encode_player(winner) << " (Opponent performed invalid move)\n";
+            ss << "Winner is " << encode_player(winner)
+               << " (Opponent performed invalid move)\n";
         } else if (next_valid_spots.size() > 0) {
             ss << encode_player(cur_player) << "'s turn\n";
         } else {
@@ -190,7 +184,7 @@ public:
         ss << "+---------------+\n";
         for (i = 0; i < SIZE; i++) {
             ss << "|";
-            for (j = 0; j < SIZE-1; j++) {
+            for (j = 0; j < SIZE - 1; j++) {
                 ss << encode_spot(i, j) << " ";
             }
             ss << encode_spot(i, j) << "|\n";
@@ -214,7 +208,7 @@ public:
         std::stringstream ss;
         ss << cur_player << "\n";
         for (i = 0; i < SIZE; i++) {
-            for (j = 0; j < SIZE-1; j++) {
+            for (j = 0; j < SIZE - 1; j++) {
                 ss << board[i][j] << " ";
             }
             ss << board[i][j] << "\n";
@@ -236,17 +230,21 @@ const int timeout = 1;
 
 void launch_executable(std::string filename) {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    std::string command = "start /min " + filename + " " + file_state + " " + file_action;
-    std::string kill = "timeout /t " + std::to_string(timeout) + " > NUL && taskkill /im " + filename + " > NUL 2>&1";
+    std::string command =
+        "start /min " + filename + " " + file_state + " " + file_action;
+    std::string kill = "timeout /t " + std::to_string(timeout) +
+                       " > NUL && taskkill /im " + filename + " > NUL 2>&1";
     system(command.c_str());
     system(kill.c_str());
 #elif __linux__
-    std::string command = "timeout " + std::to_string(timeout) + "s " + filename + " " + file_state + " " + file_action;
+    std::string command = "timeout " + std::to_string(timeout) + "s " +
+                          filename + " " + file_state + " " + file_action;
     system(command.c_str());
 #elif __APPLE__
     // May require installing the command by:
     // brew install coreutils
-    std::string command = "gtimeout " + std::to_string(timeout) + "s " + filename + " " + file_state + " " + file_action;
+    std::string command = "gtimeout " + std::to_string(timeout) + "s " +
+                          filename + " " + file_state + " " + file_action;
     system(command.c_str());
 #endif
 }
@@ -257,8 +255,10 @@ int main(int argc, char** argv) {
     std::string player_filename[3];
     player_filename[1] = argv[1];
     player_filename[2] = argv[2];
-    std::cout << "Player Black File: " << player_filename[OthelloBoard::BLACK] << std::endl;
-    std::cout << "Player White File: " << player_filename[OthelloBoard::WHITE] << std::endl;
+    std::cout << "Player Black File: " << player_filename[OthelloBoard::BLACK]
+              << std::endl;
+    std::cout << "Player White File: " << player_filename[OthelloBoard::WHITE]
+              << std::endl;
     OthelloBoard game;
     std::string data;
     data = game.encode_output();
@@ -277,9 +277,12 @@ int main(int argc, char** argv) {
         Point p(-1, -1);
         while (true) {
             int x, y;
-            if (!(fin >> x)) break;
-            if (!(fin >> y)) break;
-            p.x = x; p.y = y;
+            if (!(fin >> x))
+                break;
+            if (!(fin >> y))
+                break;
+            p.x = x;
+            p.y = y;
         }
         fin.close();
         // Reset action file

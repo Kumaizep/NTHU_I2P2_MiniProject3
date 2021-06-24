@@ -1,0 +1,5 @@
+./player_kuma:
+	O win 0 times(0%).
+./../baseline/linux/baseline4:
+	X win 1 times(100%).
+Draw 0 time(0%).

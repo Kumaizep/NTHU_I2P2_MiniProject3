@@ -1,0 +1,22 @@
+name: Build
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          cd src
+          make -j
+          cd ..
+          mkdir artifacts
+          mv src/{player_infinite,player_invalid,player_partial,player_random} artifacts
+          mv src/main artifacts
+          mv baseline/linux/* artifacts
+      - name: Archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts

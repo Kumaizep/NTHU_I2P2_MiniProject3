@@ -257,50 +257,6 @@ int MiniMax(Point p, int depth, bool round) {
 	return best;
 }
 
-int AlphaBeta(Point p, int depth, int alpha, int beta, bool round) {
-	int tmp_player = cur_player, best;
-	std::vector<Point> cur_valid_spots = get_valid_spots();
-	bool vaild = put_disc(p);
-	std::array<std::array<int, SIZE>, SIZE> tmp_board = cur_board;
-	// debug_out_board();
-	if (!vaild) {
-		best = heuristic();
-	}
-	else if (depth == 0) {
-		best = heuristic();
-	}
-	else if (cur_valid_spots.size() == 0) {
-		cur_player = get_next_player(cur_player);
-		cur_valid_spots = get_valid_spots();
-		if (cur_valid_spots.size() == 0) {
-			best = heuristic() * 10000;
-		}
-	}
-	else if (round) {
-		for (auto it : cur_valid_spots) {
-			int val = AlphaBeta(it, depth - 1, alpha, beta, !round);
-			if (alpha < val)
-				alpha = val;
-			if (alpha >= beta)
-				break;
-		}
-		best = alpha;
-	}
-	else {
-		for (auto it : cur_valid_spots) {
-			int val = AlphaBeta(it, depth - 1, alpha, beta, !round);
-			if (beta >= val)
-				beta = val;
-			if (alpha > beta)
-				break;
-		}
-		best = beta;
-	}
-	cur_player = tmp_player;
-	cur_board = tmp_board;
-	return best;
-}
-
 // ================================================================================================
 // Function/Player action 
 // ================================================================================================
@@ -334,8 +290,7 @@ void write_valid_spot(std::ofstream& fout) {
 	for (auto it : next_valid_spots) {
 		cur_board = board;
 		cur_player = player;
-		// int val = MiniMax(it, 41, true);
-		int val = AlphaBeta(it, PARA[0], std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), false);
+		int val = MiniMax(it, PARA[0], false);
 		dlout << " >> mmh_val of " << "(" << it.x << ", " << it.y << ")" << ": " << val << "\n";
 		if (val > best) {
 			best = val;

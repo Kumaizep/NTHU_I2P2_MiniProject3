@@ -12,4 +12,13 @@ tmpout
 para.txt
 decision.txt
 winner.txt
-player_kumapara
+player_kuma_ABpara
+player_kuma_AlphaBeta
+player_kuma_MCTS
+player_kuma_MCTS_Reversi
+player_kuma_MCTS_Timever
+player_kuma_MCTS_Timever_Reversi
+player_kuma_MiniMax
+player_kuma_Reversi
+src_test/.
+src_test

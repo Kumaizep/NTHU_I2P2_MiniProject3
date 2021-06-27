@@ -170,16 +170,33 @@ class OthelloBoard {
 	std::string encode_output(bool fail = false) {
 		int i, j;
 		std::stringstream ss;
+		if (cur_player == 2) {
+			std::ifstream declog("logs/decision.txt");
+			std::string strlog;
+			while (declog >> strlog) {
+				if (strlog == ">>")
+					ss << "\n";
+				ss << strlog;
+			}
+			ss << "\n\n\n";
+			declog.close();
+		}
 		ss << "Timestep #" << (8 * 8 - 4 - disc_count[EMPTY] + 1) << "\n";
 		ss << "O: " << disc_count[BLACK] << "; X: " << disc_count[WHITE]
 		   << "\n";
 		if (fail) {
 			ss << "Winner is " << encode_player(winner)
 			   << " (Opponent performed invalid move)\n";
+			std::ofstream winout("logs/winner.txt");
+			winout << encode_player(winner);
+			winout.close();
 		} else if (next_valid_spots.size() > 0) {
 			ss << encode_player(cur_player) << "'s turn\n";
 		} else {
 			ss << "Winner is " << encode_player(winner) << "\n";
+			std::ofstream winout("logs/winner.txt");
+			winout << encode_player(winner);
+			winout.close();
 		}
 		ss << "+---------------+\n";
 		for (i = 0; i < SIZE; i++) {
@@ -290,6 +307,14 @@ int main(int argc, char** argv) {
 			std::cerr << "Error removing file: " << file_action << "\n";
 		// Take action
 		if (!game.put_disc(p)) {
+			std::cout << "Invalid choice " << p.x << " " << p.y << std::endl;
+			std::ifstream fin(file_action);
+			std::string strla;
+			while (fin >> strla)
+			{
+				std::cout << strla;
+			}
+			fin.close();
 			// If action is invalid.
 			data = game.encode_output(true);
 			std::cout << data;

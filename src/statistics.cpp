@@ -8,24 +8,9 @@ const std::string file_state = "";
 const std::string file_action = "";
 const int timeout = 1;
 void launch_executable(std::string filename) {
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-	std::string command =
-		"start /min " + filename + " " + file_state + " " + file_action;
-	std::string kill = "timeout /t " + std::to_string(timeout) +
-					   " > NUL && taskkill /im " + filename + " > NUL 2>&1";
+	std::string command = filename;
 	system(command.c_str());
-	system(kill.c_str());
-#elif __linux__
-	std::string command = "timeout " + std::to_string(timeout) + "s " +
-						  filename + " " + file_state + " " + file_action;
-	system(command.c_str());
-#elif __APPLE__
-	// May require installing the command by:
-	// brew install coreutils
-	std::string command = "gtimeout " + std::to_string(timeout) + "s " +
-						  filename + " " + file_state + " " + file_action;
-	system(command.c_str());
-#endif
+
 }
 
 int main(int argc, char const *argv[])
@@ -61,7 +46,7 @@ int main(int argc, char const *argv[])
 	std::ofstream log("logs/statlog.txt");
 	log << argv[2] << ":\n\tO win " << count_O << " times(" << count_O * 100.0 / times << "%).\n";
 	log << argv[3] << ":\n\tX win " << count_X << " times(" << count_X * 100.0 / times << "%).\n";
-	log << "Draw " << count_D << " time(" << count_D * 1.0 / times << "%).\n";
+	log << "Draw " << count_D << " time(" << count_D * 100.0 / times << "%).\n";
 	log.close();
 	return 0;
 }

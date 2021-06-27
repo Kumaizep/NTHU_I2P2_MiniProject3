@@ -30,26 +30,17 @@ struct Point {
 // ================================================================================================
 int player;
 int cur_player;
+int PARA[5];
 const int SIZE = 8;
 const int BASELINE1 = 1, BASELINE2 = SIZE - 1;
 const int EMPTY = 0, BLACK = 1, WHITE = 2;
-// const int PARA[5] = {17, 1, 0, 0, 10}; 
-const int PARA[5] = {10, 2, -5, 15, 70}; 
-	// Depth, normal, backline, boundary, arc  
 std::array<std::array<int, SIZE>, SIZE> board;
 std::array<std::array<int, SIZE>, SIZE> cur_board;
 std::vector<Point> next_valid_spots;
 const std::array<Point, 8> directions{{
 	Point(-1, -1), Point(-1, 0), Point(-1, 1), Point(0, -1),
 	Point(0, 1), Point(1, -1), Point(1, 0), Point(1, 1)}};
-// const int weight[SIZE][SIZE] = {{ 90, -60, 20, 10, 10, 20, -60,  90},
-// 								{-60, -80, 10,  5,  5, 10, -80, -60},
-// 								{ 20,  10,  5,  1,  1,  5,  10,  20},
-// 								{ 10,   5,  1,  1,  1,  1,   5,  10},
-// 								{ 10,   5,  1,  1,  1,  1,   5,  10},
-// 								{ 20,  10,  5,  1,  1,  5,  10,  20},
-// 								{-60, -80, 10,  5,  5, 10, -80, -60},
-// 								{ 90, -60, 20, 10, 10, 20, -60,  90}};
+
 
 // ================================================================================================
 // Function/Board operater
@@ -119,6 +110,8 @@ void flip_discs(Point center) {
 				for (Point s : discs) {
 					set_disc(s, cur_player);
 				}
+				// disc_count[cur_player] += discs.size();
+				// disc_count[get_next_player(cur_player)] -= discs.size();
 				break;
 			}
 			discs.push_back(p);
@@ -217,11 +210,11 @@ int heuristic() {
 	return val;
 }
 
-int MiniMax(Point p, int depth, bool round) {
-	int tmp_player = cur_player, best = 0;
+int minimax(Point p, int depth, bool round) {
+	int tmp_player = cur_player, best;
+	std::array<std::array<int, SIZE>, SIZE> tmp_board;
 	std::vector<Point> cur_valid_spots = get_valid_spots();
 	bool vaild = put_disc(p);
-	std::array<std::array<int, SIZE>, SIZE> tmp_board = cur_board;
 	// debug_out_board();
 	if (!vaild) {
 		best = heuristic();
@@ -239,7 +232,7 @@ int MiniMax(Point p, int depth, bool round) {
 	else if (round) {
 		best = std::numeric_limits<int>::min();
 		for (auto it : cur_valid_spots) {
-			int val = MiniMax(it, depth - 1, !round);
+			int val = minimax(it, depth - 1, !round);
 			if (best < val)
 				best = val;
 		}
@@ -247,7 +240,7 @@ int MiniMax(Point p, int depth, bool round) {
 	else {
 		best = std::numeric_limits<int>::max();
 		for (auto it : cur_valid_spots) {
-			int val = MiniMax(it, depth - 1, !round);
+			int val = minimax(it, depth - 1, !round);
 			if (best > val)
 				best = val;
 		}
@@ -313,6 +306,13 @@ void read_board(std::ifstream& fin) {
 	}
 }
 
+void read_para(std::ifstream& para) {
+	for (int i = 0; i < 5; ++i)
+	{
+		para >> PARA[i];
+	}
+}
+
 void read_valid_spots(std::ifstream& fin) {
 	int n_valid_spots;
 	fin >> n_valid_spots;
@@ -355,11 +355,15 @@ void write_valid_spot(std::ofstream& fout) {
 // ================================================================================================
 int main(int, char** argv) {
 	std::ifstream fin(argv[1]);
+	std::ifstream para("logs/para.txt");
 	std::ofstream fout(argv[2]);
+	// std::ofstream dlout("logs/decisionlog");
 	read_board(fin);
+	read_para(para);
 	read_valid_spots(fin);
 	write_valid_spot(fout);
 	fin.close();
+	para.close();
 	fout.close();
 	return 0;
 }

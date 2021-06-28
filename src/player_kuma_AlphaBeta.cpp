@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <limits>
-
+#include <cmath>
 
 // ================================================================================================
 // Struct
@@ -30,11 +30,15 @@ struct Point {
 // ================================================================================================
 int player;
 int cur_player;
+int borad_step = 0;
 const int SIZE = 8;
 const int BASELINE1 = 1, BASELINE2 = SIZE - 1;
 const int EMPTY = 0, BLACK = 1, WHITE = 2;
 // const int PARA[5] = {17, 1, 0, 0, 10}; 
-const int PARA[5] = {10, 2, -5, 15, 70}; 
+const int PARA[2][5] = {{11, 2, -5, 15, 70},
+						{0, 2, -5, 15, 70}}; 
+const int PARA_ENDGAME[2][5] = {{11, 2, -11, 15, 70},
+								{0, 5, -5, 15, 70}}; 
 	// Depth, normal, backline, boundary, arc  
 std::array<std::array<int, SIZE>, SIZE> board;
 std::array<std::array<int, SIZE>, SIZE> cur_board;
@@ -42,14 +46,6 @@ std::vector<Point> next_valid_spots;
 const std::array<Point, 8> directions{{
 	Point(-1, -1), Point(-1, 0), Point(-1, 1), Point(0, -1),
 	Point(0, 1), Point(1, -1), Point(1, 0), Point(1, 1)}};
-// const int weight[SIZE][SIZE] = {{ 90, -60, 20, 10, 10, 20, -60,  90},
-// 								{-60, -80, 10,  5,  5, 10, -80, -60},
-// 								{ 20,  10,  5,  1,  1,  5,  10,  20},
-// 								{ 10,   5,  1,  1,  1,  1,   5,  10},
-// 								{ 10,   5,  1,  1,  1,  1,   5,  10},
-// 								{ 20,  10,  5,  1,  1,  5,  10,  20},
-// 								{-60, -80, 10,  5,  5, 10, -80, -60},
-// 								{ 90, -60, 20, 10, 10, 20, -60,  90}};
 
 // ================================================================================================
 // Function/Board operater
@@ -152,40 +148,31 @@ int get_disc_count(int state) {
 	return val;
 }
 
+int get_para(int idx)
+{
+	if (borad_step > 50)
+		return PARA_ENDGAME[player - 1][idx];
+	else
+		return PARA[player - 1][idx];
+}
+
 int get_disc_count_compensate(int state) {
 	int val = 0;
 	for (int i = 0; i < SIZE; ++i) {
 		for (int j = 0; j < SIZE; ++j) {
 			if (cur_board[i][j] == state)
 			{
-				// val += weight[i][j];
-				val += PARA[1];
+				val += get_para(1);
 
 				if (i == 0 || j == 0 || i == SIZE - 1 || j == SIZE - 1)
-					val += PARA[2];
+					val += get_para(2);
 					
 				if (i == BASELINE1 || j == BASELINE1 || i == BASELINE2 || j == BASELINE2)
-					val += PARA[3];
+					val += get_para(3);
 
 				if ((i == 0 && j == 0) || (i == SIZE - 1 && j == SIZE - 1) || 
 					(i == SIZE - 1 && j == 0) || (i == 0 && j == SIZE - 1))
-					val += PARA[4];
-				
-
-				// if ((i == 1 && j == 0) || (i == 1 && j == 1) || (i == 0 && j == 1) ||
-				// 	(i == 1 && j == SIZE - 1) || (i == 1 && j == SIZE - 2) || (i == 0 && j == SIZE - 2) ||
-				// 	(i == SIZE - 2 && j == 0) || (i == SIZE - 2 && j == 1) || (i == SIZE - 1 && j == 1) ||
-				// 	(i == SIZE - 2 && j == SIZE - 1) || (i == SIZE - 2 && j == SIZE - 2) || (i == SIZE - 1 && j == SIZE - 2)) {
-				// 	val -= 0;
-				// }
-				// if (i == BASELINE1 || j == BASELINE1 || i == BASELINE2 || j == BASELINE1)
-				// 	val -= 5;
-				// if ((i == 1 && j == 1) || (i == SIZE - 2 && j == SIZE - 2) || 
-				// 	(i == SIZE - 2 && j == 1) || (i == 1 && j == SIZE - 2)) {
-				// 	val -= 0;
-				// }
-					
-				
+					val += get_para(4);	
 			}
 		}
 	}
@@ -218,6 +205,7 @@ int heuristic() {
 }
 
 int AlphaBeta(Point p, int depth, int alpha, int beta, bool round) {
+	// std::cout << depth << "\n";
 	int tmp_player = cur_player, best;
 	std::vector<Point> cur_valid_spots = get_valid_spots();
 	bool vaild = put_disc(p);
@@ -233,12 +221,12 @@ int AlphaBeta(Point p, int depth, int alpha, int beta, bool round) {
 		cur_player = get_next_player(cur_player);
 		cur_valid_spots = get_valid_spots();
 		if (cur_valid_spots.size() == 0) {
-			best = heuristic() * 10000;
+			best = heuristic() * pow(2, depth);
 		}
 	}
 	else if (round) {
 		for (auto it : cur_valid_spots) {
-			int val = AlphaBeta(it, depth - 1, alpha, beta, !round);
+			int val = AlphaBeta(it, depth - 1, alpha, beta, false);
 			if (alpha < val)
 				alpha = val;
 			if (alpha >= beta)
@@ -248,10 +236,10 @@ int AlphaBeta(Point p, int depth, int alpha, int beta, bool round) {
 	}
 	else {
 		for (auto it : cur_valid_spots) {
-			int val = AlphaBeta(it, depth - 1, alpha, beta, !round);
-			if (beta >= val)
+			int val = AlphaBeta(it, depth - 1, alpha, beta, true);
+			if (beta > val)
 				beta = val;
-			if (alpha > beta)
+			if (alpha >= beta)
 				break;
 		}
 		best = beta;
@@ -269,6 +257,8 @@ void read_board(std::ifstream& fin) {
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
 			fin >> board[i][j];
+			if (board[i][j] != EMPTY)
+				borad_step++;
 		}
 	}
 }
@@ -286,7 +276,7 @@ void read_valid_spots(std::ifstream& fin) {
 void write_valid_spot(std::ofstream& fout) {
 	srand(time(NULL));
 	// Choose random spot. (Not random uniform here)
-	int best = std::numeric_limits<int>::min();
+	int best = std::numeric_limits<int>::min(), val;
 	Point p;
 	// std::cout << player << " is our player.\n";
 	std::ofstream dlout("logs/decision.txt");
@@ -294,7 +284,7 @@ void write_valid_spot(std::ofstream& fout) {
 	for (auto it : next_valid_spots) {
 		cur_board = board;
 		cur_player = player;
-		int val = AlphaBeta(it, PARA[0], std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), false);
+		val = AlphaBeta(it, get_para(0), std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), false);
 		dlout << " >> mmh_val of " << "(" << it.x << ", " << it.y << ")" << ": " << val << "\n";
 		if (val > best) {
 			best = val;

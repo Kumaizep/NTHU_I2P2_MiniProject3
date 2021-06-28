@@ -52,7 +52,7 @@ const int EMPTY = 0, BLACK = 1, WHITE = 2;
 const int PARA[5] = {40, 2, -5, 15, 70}; 
 	// Depth, normal, backline, boundary, arc  
 std::clock_t start_time;
-const std::clock_t TIMEOUT = 950000;
+const std::clock_t TIMEOUT = 9850000;
 std::array<std::array<int, SIZE>, SIZE> board;
 std::array<std::array<int, SIZE>, SIZE> cur_board;
 std::vector<Point> next_valid_spots;

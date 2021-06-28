@@ -14,10 +14,10 @@ all: $(EXE)
 
 ifeq ($(OS),Windows_NT)
 $(EXE): %.exe : %.cpp
-	$(CXX) -Wall -Wextra $(CXXFLAGS) -o $@ $<
+	$(CXX) -Wall -Wextra -lpthread $(CXXFLAGS) -o $@ $<
 else
 $(EXE): % : %.cpp
-	$(CXX) -Wall -Wextra $(CXXFLAGS) -o $@ $<
+	$(CXX) -Wall -Wextra -lpthread $(CXXFLAGS) -o $@ $<
 endif
 
 clean:

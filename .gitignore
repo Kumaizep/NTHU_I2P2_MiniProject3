@@ -22,3 +22,8 @@ player_kuma_MiniMax
 player_kuma_Reversi
 src_test/.
 src_test
+action
+state
+state2
+state3
+gamelog_w5.txt

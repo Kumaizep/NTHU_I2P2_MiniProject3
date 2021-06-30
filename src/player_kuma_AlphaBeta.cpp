@@ -36,9 +36,9 @@ const int BASELINE1 = 1, BASELINE2 = SIZE - 1;
 const int EMPTY = 0, BLACK = 1, WHITE = 2;
 // const int PARA[5] = {17, 1, 0, 0, 10}; 
 const int PARA[2][5] = {{11, 2, -5, 15, 70},
-						{0, 2, -5, 15, 70}}; 
+						{10, 6, -4, 0, 70}}; 
 const int PARA_ENDGAME[2][5] = {{11, 2, -11, 15, 70},
-								{0, 5, -5, 15, 70}}; 
+								{10, 6, -4, 0, 70}}; 
 	// Depth, normal, backline, boundary, arc  
 std::array<std::array<int, SIZE>, SIZE> board;
 std::array<std::array<int, SIZE>, SIZE> cur_board;

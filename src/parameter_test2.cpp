@@ -18,10 +18,10 @@ int main()
 {
 	int ans = 0;
 	std::queue<std::vector<int>> qu;
-	std::string str2 = "./main ../baseline/linux/baseline2 ./player_kuma_ABpara > tmpout";
-	std::string str3 = "./main ../baseline/linux/baseline3 ./player_kuma_ABpara > tmpout";
-	std::string str4 = "./main ../baseline/linux/baseline4 ./player_kuma_ABpara > tmpout";
-	std::string str5 = "./main ../baseline/linux/baseline5 ./player_kuma_ABpara > tmpout";
+	std::string str2 = "./main ./player_kuma_ABpara ../baseline/linux/baseline2 > tmpout";
+	std::string str3 = "./main ./player_kuma_ABpara ../baseline/linux/baseline3 > tmpout";
+	std::string str4 = "./main ./player_kuma_ABpara ../baseline/linux/baseline4 > tmpout";
+	std::string str5 = "./main ./player_kuma_ABpara ../baseline/linux/baseline5 > tmpout";
 	std::string logs;
 	for (int i = 10; i < 20; ++i)
 	{
@@ -29,7 +29,7 @@ int main()
 		{
 			for (int k = 0; k < 10; ++k)
 			{
-				for (int h = 0; h < 10; ++h)
+				for (int h = 0; h < 5; ++h)
 				{
 					for (int g = 0; g < 10; ++g)
 					{
@@ -44,10 +44,10 @@ int main()
 						if (fin >> logs)
 						{
 							if (logs[0] == 'O') {
+								ans++;
 								std::cout << "O ";
 							}
 							else {
-								ans++;
 								std::cout << "X ";
 							}
 						}
@@ -57,10 +57,10 @@ int main()
 						if (fin2 >> logs)
 						{
 							if (logs[0] == 'O') {
+								ans++;
 								std::cout << "O ";
 							}
 							else {
-								ans++;
 								std::cout << "X ";
 							}
 						}
@@ -70,10 +70,10 @@ int main()
 						if (fin3 >> logs)
 						{
 							if (logs[0] == 'O') {
+								ans++;
 								std::cout << "O ";
 							}
 							else {
-								ans++;
 								std::cout << "X ";
 							}
 						}
@@ -82,10 +82,10 @@ int main()
 						std::ifstream fin4("logs/winner.txt");
 						if (fin4 >> logs) {
 							if (logs[0] == 'O') {
+								ans++;
 								std::cout << "O\n";
 							}
 							else {
-								ans++;
 								std::cout << "X\n";
 							}
 						}

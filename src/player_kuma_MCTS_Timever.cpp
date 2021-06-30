@@ -335,7 +335,7 @@ Point MCTS(Node* root) {
 	if (root->nchild.empty())
 		return Point(-2, -2);
 	for (auto it : root->nchild) {
-		double val = it->win / it->simu;
+		double val = it->simu;
 		if (val > max) {
 			max = val;
 			mdir = it->ndir;

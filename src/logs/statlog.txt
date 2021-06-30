@@ -1,5 +1,5 @@
-./player_kuma:
-	O win 15 times(75%).
-./../baseline/linux/baseline1:
-	X win 5 times(25%).
+../baseline/linux/baseline5:
+	O win 1 times(100%).
+./player_kuma_Reversi:
+	X win 0 times(0%).
 Draw 0 time(0%).
